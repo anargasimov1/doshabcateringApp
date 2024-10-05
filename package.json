@@ -15,7 +15,6 @@
     "react-native": "0.74.5",
     "@expo/metro-runtime": "~3.2.1",
     "@react-native-async-storage/async-storage": "^2.0.0",
-    "@react-native-community/geolocation": "^3.4.0",
     "@react-navigation/native": "^6.1.18",
     "@react-navigation/native-stack": "^6.11.0",
     "babel-preset-expo": "^11.0.14",
