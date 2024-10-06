@@ -4,7 +4,6 @@ import { db } from '../config/firebaseConfig';
 import Panel from '../companents/Panel';
 import { collection, getDocs, getDoc, doc } from 'firebase/firestore';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 

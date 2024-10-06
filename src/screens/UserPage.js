@@ -1,74 +1,42 @@
-import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from 'react-native'
+import {Pressable, StyleSheet, Text, View, ScrollView } from 'react-native'
 import React, { useEffect, useState } from 'react';
 import Panel from '../companents/Panel';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebaseConfig';
-import MapView, { Marker } from 'react-native-maps';
-import * as Location from 'expo-location';
-import FontAwesomeIcon6 from 'react-native-vector-icons/FontAwesome6';
+import FontAwesomeIcon6 from 'react-native-vector-icons/FontAwesome6'
+import UserLocation from '../companents/UserLocation';
+
 
 const UserPage = ({ route }) => {
-    const [location, setLocation] = useState({});
-    const [current, setCurrent] = useState(false);
-    const [indicator, setIndicator] = useState(false)
 
     useEffect(() => {
-        getLocation();
-    }, [location])
-
-    useEffect(() => {
-        getUserData()
-    }, [])
-
-
-    const getLocation = async () => {
-        setIndicator(true)
-        try {
-            let { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                Alert.alert('sizin icazeni levğ eləmisiz')
-                return;
-            }
-            let coords = await Location.getCurrentPositionAsync({ enableHighAccuracy: true })
-            setLocation({
-                latitude: coords.coords.latitude,
-                longitude: coords.coords.longitude,
-                latitudeDelta: 0.0922,
-                longitudeDelta: 0.0421,
-            })
-
-        } catch (error) {
-            console.log(error)
-        }
-        setCurrent(true)
-        setIndicator(false)
-    }
-
-
+        getUserData();
+    }, []);
 
     const { id } = route.params;
+    const [user, setUser] = useState('');
+    const [name, setName] = useState('')
 
-    const [user, setUser] = useState('')
+    const navigation = useNavigation();
 
-    const navigation = useNavigation()
-
-    async function singUp() {
-        await AsyncStorage.removeItem('token')
-        navigation.replace('login')
+    async function signUp() {
+        await AsyncStorage.removeItem('token');
+        navigation.replace('login');
     }
 
     async function getUserData() {
         try {
             const docRef = doc(db, 'users', id);
             const docSnap = await getDoc(docRef);
-
             if (docSnap.exists()) {
                 setUser(docSnap.data());
+                setName(docSnap.data().name.slice(0, 1))
             } else {
                 console.log('Belə bir sənəd mövcud deyil');
             }
+
         } catch (error) {
             console.error('Xəta baş verdi:', error);
         }
@@ -76,122 +44,114 @@ const UserPage = ({ route }) => {
 
 
 
+
     return (
         <>
 
-            <View style={styles.contanier} >
-            </View>
-            <View style={styles.headText}>
+            <ScrollView style={{ marginBottom: 50 }}>
+                <View style={styles.title}>
+                    <View style={styles.headText}>
+                        <Text style={styles.name}>
+                            {name}
+                        </Text>
+                    </View>
+                    <Text style={styles.text}>
+                        Xoş gəlmisən  {user.name}
+                    </Text>
+                </View>
+                <Text style={styles.info}>İstifadəçi məlumatları</Text>
+                <View style={styles.userInfo}>
+                    <Text style={styles.text}>Ad:  {user.name}</Text>
+                    <Text style={styles.text}>Email:  {user.email}</Text>
+                    <Text style={styles.text}>Nömrə: {user.phone}</Text>
 
-                <Text style={styles.text}>
-                    Xoş gəlmisən  {user.name}
-                </Text>
-            </View>
+                </View>
+                {
+                    <UserLocation />
+                }
 
 
-            <Text style={styles.text}>
-                adi:  {user.name}
-            </Text>
-            <Text style={styles.text}>
-                email:  {user.email}
-            </Text>
-            <Text style={styles.text}>
-                nomre: {user.phone}
-            </Text>
-            {indicator ? <ActivityIndicator style={styles.indicator} size="large" color="blue" /> : null}
+                <Text style={styles.order}>Sifarişləriniz</Text>
 
-            {
-                current ?
-                    <MapView
-                        style={styles.map}
-                        region={location}
-                    >
-                        {<Marker coordinate={{ latitude: location.latitude, longitude: location.longitude }} title="My Marker" pinColor='red' />}
-                    </MapView> :
+                <Pressable Pressable onPress={signUp} style={styles.button}>
 
-                    <MapView
-                        style={styles.map}
-                        region={{
-                            latitude: 40.56,
-                            longitude: 49.126
-                        }}
-                    >
-                        {<Marker coordinate={{ latitude: 50.56, longitude: 49.123 }} title="My Marker" pinColor='blue' />}
-                    </MapView>
+                    <FontAwesomeIcon6 style={styles.buttonIcon} name="arrow-right-from-bracket" />
+                    <Text style={styles.buttontext}>
+                        Hesabdan çıxış
+                    </Text>
+                </Pressable >
 
-            }
 
-            <Pressable onPress={() => singUp()} style={styles.button}>
-                <Text style={styles.text}>
-                    Çıxış
-                </Text>
-            </Pressable>
-            <Pressable onPress={() => { getLocation(), setIndicator(true) }} style={styles.buttonLocation}>
-                <FontAwesomeIcon6 style={styles.icon} name="location-crosshairs" />
-            </Pressable>
+            </ScrollView>
 
             <Panel />
-
         </>
     )
 }
 
-export default UserPage
+export default UserPage;
 
 const styles = StyleSheet.create({
-    contanier: {
-
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 50
-    },
     headText: {
-        flexDirection: 'row',
+        backgroundColor: '#9592a1',
         gap: 20,
+        width: 75,
+        height: 75,
+        borderRadius: 40,
+        justifyContent: 'center',
+        alignItems: 'center'
     },
-    title: {
-        backgroundColor: 'grey',
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-    },
-
-    titletext: {
-
+    name: {
+        fontSize: 35,
+        fontWeight: 'bold',
+        color: 'white'
     },
     text: {
         fontWeight: 'bold',
-        fontSize: 20,
+        fontSize: 18,
         fontStyle: 'italic',
         color: '#9592a1',
     },
     button: {
         width: 200,
         height: 50,
-        backgroundColor: 'red'
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 20
     },
-    map: {
-        width: 380,
-        height: 300
+    info: {
+        marginTop: 25,
+        fontSize: 20,
+        color: 'grey',
+        textAlign: 'center',
+        fontStyle: 'italic'
     },
-    icon: {
-        fontSize: 30,
-        color: '#9592a1'
+    title: {
+        justifyContent: 'space-around',
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 75,
+        paddingHorizontal: 10
     },
-    buttonLocation: {
-        marginTop: 50,
-        marginLeft: 50,
-        position: 'absolute',
-        top: 350,
-        right: 50,
+    userInfo: {
+        gap: 20,
+        marginVertical: 50
     },
-    indicator: {
-        width: 380,
-        height: 300,
-        position: 'absolute',
-        zIndex: 25,
-        backgroundColor: 'grey',
-        opacity: 0.5,
-        top: 160
+    buttontext: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: 'red'
+    },
+    buttonIcon: {
+        fontSize: 20,
+        color: 'red'
+    },
+    order: {
+        fontSize: 28,
+        color: 'grey',
+        fontStyle: 'italic',
+        textAlign: 'center',
+        marginVertical: 20
     }
-})
+
+});
