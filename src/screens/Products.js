@@ -30,17 +30,31 @@ const Products = ({ route }) => {
         }
     }
 
+    function getProduct(title, description, url, prince) {
+        let productExists = items.some(i => i.title === title);
+
+        if (!productExists) {
+            let products = { title, description, url, prince };
+            items.push(products);
+            console.log(items, items.length);
+        }
+        storeData(items)
+
+    }
+
 
     // Obyekti AsyncStorage-a əlavə etmək üçün funksiyanı yaradırıq
-    const storeData = async () => {
+    const storeData = async (product) => {
         try {
-            await AsyncStorage.setItem('wishlist', JSON.stringify(wishlist));
+
+            await AsyncStorage.setItem('wishlist', JSON.stringify(product));
+            
+
+
         } catch (e) {
             console.error('Failed to save the data to the storage', e);
         }
     };
-
-    storeData();
 
     return (
 
@@ -75,11 +89,11 @@ const Products = ({ route }) => {
                                                 {i.prince} ₼
                                             </Text>
                                         </View>
-                                        <Pressable onPress={() => { { setWishlist([...wishlist, { title: i.title, prince: i.prince, url: i.url }]) } }} style={styles.button}>
+                                        <Pressable onPress={() => { getProduct(i.title, i.description, i.url, i.prince) }} style={styles.button}>
                                             <Text style={styles.buttonText}>
                                                 Səbətə əlavə et
                                             </Text>
-                                            <MaterialIcon name={"turned-in-not"} style={styles.icon} />
+                                            <MaterialIcon name="turned-in-not" style={styles.icon} />
                                         </Pressable>
                                     </View>
 

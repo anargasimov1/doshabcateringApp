@@ -1,7 +1,8 @@
-import { StyleSheet, Text, View, Image, Pressable, ScrollView } from 'react-native'
+import { StyleSheet, Text, View, Image, Pressable, ScrollView, Dimensions } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Entypo from 'react-native-vector-icons/Entypo'
 
 
 const Wishlist = () => {
@@ -39,7 +40,7 @@ const Wishlist = () => {
     return (
         <ScrollView>
             {
-                datas.map((i, index) => {
+                datas.length ? datas.map((i, index) => {
                     return (
                         <View style={styles.container} key={index}>
                             <View style={{ flexDirection: 'row', gap: 10 }}>
@@ -74,7 +75,13 @@ const Wishlist = () => {
 
                         </View>
                     )
-                })
+                }) :
+                    <View style={styles.noContentContainer}>
+                        <Text style={styles.noContent}>
+                            siz seçim etməmsiz
+                        </Text>
+                        <Entypo name="emoji-sad" style={styles.icon} />
+                    </View>
             }
         </ScrollView>
     )
@@ -115,5 +122,24 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderColor: 'grey',
 
+    },
+    noContentContainer: {
+        width: Dimensions.get('window').width,
+        height: Dimensions.get('window').height,
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 150,
+        backgroundColor: '#c0bdc5'
+    },
+
+    noContent: {
+        fontWeight: 'bold',
+        fontSize: 28,
+        marginTop: 10,
+        fontStyle: 'italic',
+    },
+    icon: {
+        fontSize: 100,
+        color: '#b12626'
     }
 })

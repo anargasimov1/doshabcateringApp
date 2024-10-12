@@ -1,22 +1,20 @@
-import { StyleSheet, View, Alert, ActivityIndicator } from 'react-native'
+import { StyleSheet, View, Alert, ActivityIndicator, Linking, Dimensions } from 'react-native'
 import React, { useState, useEffect } from 'react';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 
 const UserLocation = () => {
 
+  const [location, setLocation] = useState(null);
+  const [toogle, setToogle] = useState(false)
+
   useEffect(() => {
-    getLocation()
-  }, []);
+    getLocation();
+  }, [toogle])
 
-
-  const [location, setLocation] = useState({});
-  const [enableServis, setEnableServis] = useState(false);
-  const [indicator, setIndicator] = useState(false)
 
   const getLocation = async () => {
     try {
-      setIndicator(true)
       // geolokasiyanın təyin üçün icazə almaq
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
@@ -30,39 +28,47 @@ const UserLocation = () => {
         Alert.alert(
           'Geolokasiya deaktivdir',
           'Telefonunuzda geolokasiya deaktivdir. Zəhmət olmasa onu aktiv edin və yenidən cəhd edin',
-          [{ text: 'OK' }]
+          [{
+            text: 'OK',
+            onPress: () => {
+              Linking.openSettings();
+            }
+          }]
         );
-        setEnableServis(false)
         return;
       }
-      else {
 
-        let coords = await Location.getCurrentPositionAsync({ enableHighAccuracy: true });
-        setLocation({
-          latitude: coords.coords.latitude,
-          longitude: coords.coords.longitude,
-          latitudeDelta: 0.001,
-          longitudeDelta: 0.01,
-        });
+      let currentPosition = await Location.getCurrentPositionAsync({})
+      // setLocation(currentPosition.coords.latitude);
+      console.log(location)
 
-        setEnableServis(true)
-      }
     } catch (error) {
       console.log("Error:", error)
     }
-    setIndicator(false)
+
+  };
+
+
+  const handleMapPress = (event) => {
+    const { coordinate } = event.nativeEvent;
+    setLocation(coordinate)
+    setToogle(!toogle)
   };
 
   return (
     <>
       <View>
-        {indicator && <ActivityIndicator size="large" style={styles.indicator} />}
-        {enableServis && <MapView style={styles.map} region={location}>
-          {
-            <Marker coordinate={location} title='marker' pinColor='red' />
-          }
-        </MapView>}
-        
+
+        <MapView
+          style={styles.map}
+          showsUserLocation={true}
+          followsUserLocation={true}
+          showsMyLocationButton={true}
+          onPress={handleMapPress}
+        >
+          {location && location !== null ? < Marker coordinate={location} pinColor='#3e14de' /> : null}
+        </MapView>
+
       </View>
 
     </>
@@ -73,15 +79,7 @@ export default UserLocation
 
 const styles = StyleSheet.create({
   map: {
-    width: 384,
-    height: 300
-  },
-  indicator: {
-    position: 'absolute',
-    zIndex: 12,
-    backgroundColor: 'lightgrey',
-    width: 384,
-    height: 300,
-    opacity: 0.5
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height * 0.33
   }
 })

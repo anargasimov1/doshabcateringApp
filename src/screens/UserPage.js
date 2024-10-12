@@ -1,4 +1,4 @@
-import {Pressable, StyleSheet, Text, View, ScrollView } from 'react-native'
+import { Pressable, StyleSheet, Text, View, ScrollView } from 'react-native'
 import React, { useEffect, useState } from 'react';
 import Panel from '../companents/Panel';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -66,10 +66,8 @@ const UserPage = ({ route }) => {
                     <Text style={styles.text}>Nömrə: {user.phone}</Text>
 
                 </View>
-                {
-                    <UserLocation />
-                }
 
+                <UserLocation />
 
                 <Text style={styles.order}>Sifarişləriniz</Text>
 
@@ -99,18 +97,21 @@ const styles = StyleSheet.create({
         height: 75,
         borderRadius: 40,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        marginLeft:10
     },
     name: {
         fontSize: 35,
         fontWeight: 'bold',
-        color: 'white'
+        color: 'white',
+       
     },
     text: {
         fontWeight: 'bold',
         fontSize: 18,
         fontStyle: 'italic',
         color: '#9592a1',
+        marginRight: 80
     },
     button: {
         width: 200,
@@ -127,7 +128,7 @@ const styles = StyleSheet.create({
         fontStyle: 'italic'
     },
     title: {
-        justifyContent: 'space-around',
+        justifyContent: 'space-between',
         flexDirection: 'row',
         alignItems: 'center',
         marginTop: 75,
